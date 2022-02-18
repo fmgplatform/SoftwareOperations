@@ -1,4 +1,4 @@
-﻿
+
 
 $Username = Read-Host 'What is your user name?'
 $UserEmail = Read-Host 'What is your email address?'
