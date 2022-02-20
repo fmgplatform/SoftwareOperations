@@ -24,4 +24,4 @@ invoke-expression $($script.Content)
 
 
 
-At the start of the script it will ask for your username and email address that you would like assoicated with the Github install
+At the start of the script it will ask for your username, this is your display name when you log into your computer, the email address is your normal fmg email address.
