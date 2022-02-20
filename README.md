@@ -6,7 +6,7 @@
 Open up a Powershell prompt in Administration Mode
 ```
 Set-ExecutionPolicy Bypass -Scope Process -Force; 
-$script = Invoke-WebRequest https://raw.githubusercontent.com/fmgplatform/SoftwwareOperations/master/OperationsSoftwareInstalls.ps1 -UseBasicParsing; 
+$script = Invoke-WebRequest https://raw.githubusercontent.com/fmgplatform/SoftwareOperations/master/OperationsSoftwareInstalls.ps1 -UseBasicParsing; 
 invoke-expression $($script.Content)
 ```
 
