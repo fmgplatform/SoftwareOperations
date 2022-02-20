@@ -1,7 +1,7 @@
 
 
-$Username = Read-Host 'What is your user name?'
-$UserEmail = Read-Host 'What is your email address?'
+$Username = Read-Host 'What is your user Display name e.g Bob Smtih?'
+$UserEmail = Read-Host 'What is your FMG email address?'
 
 
 
