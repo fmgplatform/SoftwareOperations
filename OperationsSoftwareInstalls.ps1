@@ -1,21 +1,4 @@
-<#
-.SYNOPSIS
-	Script to auto-install the latest versions of 
-  Visual Studio Code
-  Git for Windows
-  Terraform
 
-.DESCRIPTION
-	Script will scrape the following websites to install the latest versions of the software. This small set of software 
-  is used as the base set for the Operations team to start using GitHub and Terraform. 
-
-
-.LINK
-   https://code.visualstudio.com
-   https://gitforwindows.org/
-   https://www.terraform.io/
-   
-#>
 
 $Username = Read-Host 'What is your user Display name e.g Bob Smtih?'
 $UserEmail = Read-Host 'What is your FMG email address?'
