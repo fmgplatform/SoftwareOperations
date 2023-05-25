@@ -48,6 +48,8 @@ Start-Process -wait -filepath $exe  -ArgumentList " --install-extension eamodio.
 Start-Process -wait -filepath $exe  -ArgumentList " --install-extension hashicorp.terraform" 
 Start-Process -wait -filepath $exe  -ArgumentList " --install-extension ms-azuretools.vscode-azureterraform" 
 Start-Process -wait -filepath $exe  -ArgumentList " --install-extension ms-vscode.powershell" 
+Start-Process -wait -filepath $exe  -ArgumentList " --install-extension ms-azuretools.vscode-logicapps" 
+Start-Process -wait -filepath $exe  -ArgumentList " --install-extension azapi-vscode.azapi"
 
 
 
