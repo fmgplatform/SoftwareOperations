@@ -21,9 +21,11 @@
 
 
 
-$Username = Read-Host 'What is your user Display name e.g Bob Smtih?'
+$UserName = Read-Host 'What is your user Display name e.g Bob Smtih?'
 $UserEmail = Read-Host 'What is your FMG email address?'
 
+# Check if user is a local administrator
+$IsAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
 
 
 #################################################################
@@ -32,24 +34,35 @@ $UserEmail = Read-Host 'What is your FMG email address?'
 ###
 ###############################################################
 
-Write-host -ForegroundColor Yellow Installing Virtual Studio code
-$exe = $env:TEMP + "\vscode.exe"
-Invoke-WebRequest -Uri "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64"  -outfile $exe
-Start-Process -wait -filepath $exe  -ArgumentList "/SILENT /NORESTART /MERGETASKS=!runcode"
+Write-host -ForegroundColor Yellow "Installing Virtual Studio code"
 
+if ($IsAdmin) {
+    # Install Admin version of VSCode
+    $exe = $env:TEMP + "\vscode.exe"
+    Invoke-WebRequest -Uri "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64"  -outfile $exe
+    Start-Process -wait -filepath $exe  -ArgumentList "/SILENT /NORESTART /MERGETASKS=!runcode"
+    $exelocation = "C:\Program Files\Microsoft VS Code\bin\code"
+} else {
+    # Install User version of VSCode
+    $exe = $env:TEMP + "\vscode.exe"
+    Invoke-WebRequest -Uri "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user"  -outfile $exe
+    Start-Process -wait -filepath $exe  -ArgumentList "/SILENT /NORESTART /MERGETASKS=!runcode"
+    $exelocation = "$env:LOCALAPPDATA\Programs\Microsoft VS Code\bin\code"
+}
 
-Write-host -ForegroundColor Yellow Installing extensions for Virtual Studio code
+Write-host -ForegroundColor Yellow "Installing extensions for Virtual Studio code"
 
 ##########################
 ## installing extensions
 #########################
-$exe = "C:\Program Files\Microsoft VS Code\bin\code"
-Start-Process -wait -filepath $exe  -ArgumentList " --install-extension eamodio.gitlens" 
-Start-Process -wait -filepath $exe  -ArgumentList " --install-extension hashicorp.terraform" 
-Start-Process -wait -filepath $exe  -ArgumentList " --install-extension ms-azuretools.vscode-azureterraform" 
-Start-Process -wait -filepath $exe  -ArgumentList " --install-extension ms-vscode.powershell" 
-Start-Process -wait -filepath $exe  -ArgumentList " --install-extension ms-azuretools.vscode-logicapps" 
-Start-Process -wait -filepath $exe  -ArgumentList " --install-extension azapi-vscode.azapi"
+
+Start-Process -wait -filepath $exelocation  -ArgumentList " --install-extension eamodio.gitlens" 
+Start-Process -wait -filepath $exelocation  -ArgumentList " --install-extension hashicorp.terraform" 
+Start-Process -wait -filepath $exelocation  -ArgumentList " --install-extension ms-azuretools.vscode-azureterraform" 
+Start-Process -wait -filepath $exelocation  -ArgumentList " --install-extension ms-vscode.powershell" 
+Start-Process -wait -filepath $exelocation  -ArgumentList " --install-extension ms-azuretools.vscode-logicapps" 
+Start-Process -wait -filepath $exelocation  -ArgumentList " --install-extension azapi-vscode.azapi"
+
 
 
 
@@ -79,9 +92,14 @@ Write-host -ForegroundColor Yellow Adding your username and email to git config
 ##############################
 ## adding required git config
 #############################
-$exe = "c:\Program Files\Git\bin\git.exe"
-Start-process -FilePath $exe -ArgumentList ("config --global user.name """  + $Username +"""")
-Start-process -FilePath $exe -ArgumentList ("config --global user.email """ +$UserEmail +"""")
+if ($IsAdmin) {
+    $exelocation = "c:\Program Files\Git\bin\git.exe"
+}
+else {
+    $exelocation = "$env:LOCALAPPDATA\Programs\Git\bin\git.exe"
+}
+Start-process -FilePath $exelocation -ArgumentList ("config --global user.name """  + $UserName +"""")
+Start-process -FilePath $exelocation -ArgumentList ("config --global user.email """ +$UserEmail +"""")
 
 
 
@@ -103,7 +121,7 @@ Write-host -ForegroundColor Yellow Installing Terraform
 
 #read the latest version
 $tf_release_url = "https://api.github.com/repos/hashicorp/terraform/releases/latest"
-$web_content = Invoke-WebRequest -Uri $tf_release_url -UseBasicParsing |	ConvertFrom-Json
+$web_content = Invoke-WebRequest -Uri $tf_release_url -UseBasicParsing | ConvertFrom-Json
 $latest_tf_version = $web_content.tag_name.replace("v","")
 
 #set the url on the above information
@@ -116,15 +134,24 @@ $installer = "$env:temp\$($asset)"
 #download
 Invoke-WebRequest -Uri $url -OutFile $installer
 
-Write-host -ForegroundColor yellow unzipping and updateing path for Terraform
+Write-host -ForegroundColor yellow "Unzipping and updating path for Terraform"
+
 #unzip
 $tf_path = "C:\Terraform"
 Expand-Archive -Path $installer -DestinationPath $tf_path -Force
 $nulloutput = New-Item -ItemType SymbolicLink -Path $tf_path\tf.exe -Target $tf_path\Terraform.exe -ErrorAction SilentlyContinue
 
-
 #add to path
+if ($IsAdmin) {
+    # Update system-wide Path environment variable
+    if (-not(([Environment]::GetEnvironmentVariable("Path", "Machine")).split(";") -contains $tf_path)) {
+        [Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", "Machine") + ";"+ $tf_path , "Machine")
+    }
+} else {
+    # Update user-specific Path environment variable
+    if (-not(([Environment]::GetEnvironmentVariable("Path", "User")).split(";") -contains $tf_path)) {
+        [Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", "User") + ";"+ $tf_path , "User")
+    }
+}
 
-if (-not($env:Path.split(";") -contains $tf_path)) {[Environment]::SetEnvironmentVariable("Path", $env:Path + ";"+ $tf_path , "Machine") }
-
-Write-host -ForegroundColor yellow Completed
+Write-host -ForegroundColor yellow "Completed"
