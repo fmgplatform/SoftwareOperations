@@ -3,12 +3,22 @@
 
 ## How to install the software
 
+#If you are a local Administrator of your computer
 Open up a Powershell prompt in Administration Mode
 ```
 Set-ExecutionPolicy Bypass -Scope Process -Force; 
 $script = Invoke-WebRequest https://raw.githubusercontent.com/fmgplatform/SoftwareOperations/master/OperationsSoftwareInstalls.ps1 -UseBasicParsing; 
 invoke-expression $($script.Content)
 ```
+
+#If you are NOT a local Administrator of your computer
+Open up a Powershell prompt
+```
+Set-ExecutionPolicy Bypass -Scope Process -Force; 
+$script = Invoke-WebRequest https://raw.githubusercontent.com/fmgplatform/SoftwareOperations/master/OperationsSoftwareInstalls.ps1 -UseBasicParsing; 
+invoke-expression $($script.Content)
+```
+
 
 
 ## This script will perform the following actions
@@ -20,7 +30,7 @@ invoke-expression $($script.Content)
 * Downlad and install Terraform 
 * Add the Terraform path to windows search path
 * create symbolic link called tf for Terraform 
-
+* If you are a local Administrator this software will be installed to all-users, if you are not then it will only be installed for your login. 
 
 
 
