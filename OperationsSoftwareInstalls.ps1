@@ -154,4 +154,73 @@ if ($IsAdmin) {
     }
 }
 
+
+
+
+Write-host -ForegroundColor Yellow Installing Terraform Docs
+
+#################################################################
+####
+###           Installing Terraform Docs
+###
+###############################################################
+
+
+# Set the URL to the latest release page
+$latestReleaseUrl = "https://api.github.com/repos/terraform-docs/terraform-docs/releases/latest"
+
+# Get the JSON data of the latest release
+$latestRelease = Invoke-RestMethod -Uri $latestReleaseUrl
+
+# Find the download URL for the Windows amd64 zip file
+$downloadUrl = $latestRelease.assets | Where-Object { $_.name -like "*windows-amd64.zip" } | Select-Object -ExpandProperty browser_download_url
+
+# Set the output file path
+$outputFilePath = "$HOME\Downloads\terraform-docs-windows-amd64.zip"
+
+# Download the file
+Invoke-WebRequest -Uri $downloadUrl -OutFile $outputFilePath
+
+# Unzip the downloaded file
+Expand-Archive -Path $outputFilePath -DestinationPath "$HOME\Downloads\terraform-docs-windows-amd64"
+
+
+#set the correct install path
+if ($IsAdmin) { 
+     $installPath = "C:\Program Files\terraform-docs" 
+    }
+else {
+   
+    $installPath = "$env:LOCALAPPDATA\terraform-docs" 
+    }
+
+
+# Create the installation directory if it doesn't exist
+if (!(Test-Path $installPath)) {
+    New-Item -ItemType Directory -Path $installPath | Out-Null
+}
+
+
+# Copy the unzipped files to the installation directory
+Copy-Item "$HOME\Downloads\terraform-docs-windows-amd64\*" $installPath -Force
+
+if ($IsAdmin){
+    # Update system-wide Path environment variable
+    if (-not(([Environment]::GetEnvironmentVariable("Path", "Machine")).split(";") -contains $installPath)) {
+        [Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", "Machine") + ";"+ $installPath , "Machine")
+    }
+} else {
+    # Update user-specific Path environment variable
+    if (-not(([Environment]::GetEnvironmentVariable("Path", "User")).split(";") -contains $installPath)) {
+        [Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", "User") + ";"+ $installPath , "User")
+    }
+}
+
+
+# Clean up old files
+Remove-Item $outputFilePath
+Remove-Item "$HOME\Downloads\terraform-docs-windows-amd64" -Recurse
+
+
+
 Write-host -ForegroundColor yellow "Completed"
