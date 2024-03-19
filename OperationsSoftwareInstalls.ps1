@@ -62,7 +62,7 @@ Start-Process -wait -filepath $exelocation  -ArgumentList " --install-extension 
 Start-Process -wait -filepath $exelocation  -ArgumentList " --install-extension ms-vscode.powershell" 
 Start-Process -wait -filepath $exelocation  -ArgumentList " --install-extension ms-azuretools.vscode-logicapps" 
 Start-Process -wait -filepath $exelocation  -ArgumentList " --install-extension azapi-vscode.azapi"
-Start-Process -wait -filepath $exelocation  -ArgumentList " --install-extension jono.terraformregistrylookup
+Start-Process -wait -filepath $exelocation  -ArgumentList " --install-extension jono.terraformregistrylookup"
 
 
 
